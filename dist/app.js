@@ -22,7 +22,7 @@ app.use('/api/v1/academicSemester', route_1.default);
 app.use('/api/v1/academicFaculty', route_2.default);
 app.use('/api/v1/academicDepartment', route_3.default);
 app.get('/', (req, res) => {
-    res.json({ message: 'auth service for university management' });
+    res.json({ message: 'Core service for university management' });
 });
 //global error handler
 app.use(globalErrorHandler_1.default);

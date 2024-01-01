@@ -25,7 +25,7 @@ app.use('/api/v1/academicDepartment',academicDepartmentRoute)
 
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'auth service for university management' })
+  res.json({ message: 'Core service for university management' })
 })
 
 //global error handler

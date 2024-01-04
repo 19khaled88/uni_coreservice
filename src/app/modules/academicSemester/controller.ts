@@ -12,13 +12,7 @@ const createAcademicSememster = async (
     next: NextFunction,
 ) => {
     try {
-        // if(req.body.code === '01'){
-        //     req.body.code = 'ZERO_1'
-        // }else if(req.body.code === '02'){
-        //     req.body.code = 'ZERO_2'
-        // }else if(req.body.code === '03'){
-        //     req.body.code = 'ZERO_3'
-        // }
+       
         
         const response = await academicSemesterService.createAcademicSemester(
             req.body,

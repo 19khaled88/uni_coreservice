@@ -13,7 +13,7 @@ router.put(
 )
 router.delete('/delete-department/:id', academicDepartmentController.deleteDepartment)
 router.post(
-  '/create-ac-department',
+  '/create',
   validateRequest(AcademicDepartmentZodValidation.createDepartmentZodSchema),
   academicDepartmentController.createAcademicDepartment,
 )

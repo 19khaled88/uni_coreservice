@@ -24,12 +24,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.academicDepartmentService = void 0;
+const client_1 = require("@prisma/client");
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationCalculate_1 = require("../../../helpers/paginationCalculate");
-const model_1 = require("./model");
 const constants_1 = require("./constants");
+const prisma = new client_1.PrismaClient();
 const createAcademicDepartment = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const res = yield model_1.AcademicDepartment.create(data);
+    const res = yield prisma.academicDepartment.create({
+        data: data
+    });
     if (!res) {
         throw new Error('Failed to create academic department');
     }
@@ -54,32 +57,37 @@ const allDepartments = (paginationOptions, filter) => __awaiter(void 0, void 0, 
     const andCondition = [];
     if (searchTerm) {
         andCondition.push({
-            $or: constants_1.departmentSearchableFields.map((item, index) => ({
-                [item]: {
-                    $regex: searchTerm,
-                    $options: 'i'
-                }
-            }))
+            OR: constants_1.departmentSearchableFields.map((item) => {
+                return {
+                    [item]: {
+                        contains: searchTerm,
+                        mode: "insensitive",
+                    },
+                };
+            }),
         });
     }
     if (Object.keys(filters).length) {
         andCondition.push({
-            $and: Object.entries(filters).map(([field, value]) => ({
+            AND: Object.entries(filters).map(([field, value]) => ({
                 [field]: value
             }))
         });
     }
-    const finalConditions = andCondition.length > 0 ? { $and: andCondition } : {};
+    const finalConditions = andCondition.length > 0 ? { AND: andCondition } : {};
     const sortCondition = {};
     if (paginate.sortBy && paginate.sortOrder) {
         sortCondition[paginate.sortBy] = paginate.sortOrder;
     }
-    const res = yield model_1.AcademicDepartment.find(finalConditions)
-        .sort(sortCondition)
-        .skip(paginate.skip)
-        .limit(paginate.limit)
-        .populate('academicFaculty');
-    const total = yield model_1.AcademicDepartment.countDocuments();
+    const res = yield prisma.academicDepartment.findMany({
+        where: finalConditions,
+        take: paginate.limit,
+        skip: paginate.skip,
+        orderBy: paginate.sortBy && paginate.sortOrder
+            ? { [paginate.sortBy]: paginate.sortOrder }
+            : { createdAt: "asc" },
+    });
+    const total = yield prisma.academicDepartment.count();
     return {
         meta: {
             page: paginate.page,
@@ -90,23 +98,49 @@ const allDepartments = (paginationOptions, filter) => __awaiter(void 0, void 0, 
     };
 });
 const singleDepartment = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield model_1.AcademicDepartment.findById(id).select({ _id: 0 }).populate('academicFaculty');
+    const response = yield prisma.academicDepartment.findFirst({
+        where: { id: id },
+        select: {
+            title: true,
+            academicFaculty: true,
+            academicFacultyId: true,
+            faculties: true,
+            students: true
+        }
+    });
     return response;
 });
 const updateDepartment = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield model_1.AcademicDepartment.findById(id);
+    const isExist = yield prisma.academicDepartment.findFirst({
+        where: {
+            id: id
+        }
+    });
     if (!isExist) {
         throw new ApiError_1.default(400, 'This department not exist');
     }
-    const response = yield model_1.AcademicDepartment.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+    const response = yield prisma.academicDepartment.update({
+        where: {
+            id: id
+        },
+        data: payload
+    });
     return response;
 });
 const deleteDepartment = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield model_1.AcademicDepartment.findById(id);
+    const isExist = yield prisma.academicDepartment.findFirst({
+        where: {
+            id: id
+        }
+    });
     if (!isExist) {
         throw new ApiError_1.default(400, 'This department not exist');
     }
-    const response = yield model_1.AcademicDepartment.findByIdAndDelete(id);
+    const response = yield prisma.academicDepartment.delete({
+        where: {
+            id: id
+        }
+    });
     return response;
 });
 exports.academicDepartmentService = {

@@ -1,18 +1,22 @@
-import status from 'http-status'
+import {Prisma,PrismaClient,AcademicDepartment} from '@prisma/client'
 import ApiError from '../../../errors/ApiError'
 import { calculatePagination } from '../../../helpers/paginationCalculate'
 import { IFilters, IPagination } from '../../../interfaces/paginationType'
 import { IGenericResponse } from '../../../shared/constants'
 
 import { IAcademicDepartment,  } from './interface'
-import { AcademicDepartment } from './model'
+
 import { departmentSearchableFields } from './constants'
 
+const prisma = new PrismaClient()
+
 const createAcademicDepartment = async (
-    data: IAcademicDepartment,
-): Promise<IAcademicDepartment | null> => {
+    data: AcademicDepartment,
+): Promise<AcademicDepartment | null> => {
    
-    const res = await AcademicDepartment.create(data)
+    const res = await prisma.academicDepartment.create({
+        data:data
+    })
     if (!res) {
         throw new Error('Failed to create academic department')
     }
@@ -22,7 +26,7 @@ const createAcademicDepartment = async (
 const allDepartments = async (
     paginationOptions: IPagination,
     filter: IFilters,
-): Promise<IGenericResponse<IAcademicDepartment[]> | null> => {
+): Promise<IGenericResponse<AcademicDepartment[]> | null> => {
     const { page, limit, sortBy, sortOrder } = paginationOptions
     const { searchTerm, ...filters } = filter
 
@@ -45,24 +49,26 @@ const allDepartments = async (
 
     if (searchTerm) {
         andCondition.push({
-            $or: departmentSearchableFields.map((item: string, index: number) => ({
-                [item]: {
-                    $regex: searchTerm,
-                    $options: 'i'
-                }
-            }))
-        })
-    }
+          OR: departmentSearchableFields.map((item) => {
+            return {
+              [item]: {
+                contains: searchTerm,
+                mode: "insensitive",
+              },
+            };
+          }),
+        });
+      }
 
     if (Object.keys(filters).length) {
         andCondition.push({
-            $and: Object.entries(filters).map(([field, value]) => ({
+            AND: Object.entries(filters).map(([field, value]) => ({
                 [field]: value
             }))
         })
     }
 
-    const finalConditions = andCondition.length > 0 ? { $and: andCondition } : {}
+    const finalConditions:Prisma.AcademicDepartmentWhereInput = andCondition.length > 0 ? { AND: andCondition } : {}
 
     const sortCondition: { [key: string | number]: any } = {}
 
@@ -70,12 +76,16 @@ const allDepartments = async (
         sortCondition[paginate.sortBy] = paginate.sortOrder
     }
 
-    const res = await AcademicDepartment.find(finalConditions)
-        .sort(sortCondition)
-        .skip(paginate.skip)
-        .limit(paginate.limit)
-        .populate('academicFaculty')
-    const total = await AcademicDepartment.countDocuments()
+    const res = await prisma.academicDepartment.findMany({
+        where: finalConditions,
+        take: paginate.limit,
+        skip: paginate.skip,
+        orderBy:
+          paginate.sortBy && paginate.sortOrder
+            ? { [paginate.sortBy]: paginate.sortOrder }
+            : { createdAt: "asc" },
+      });
+      const total = await prisma.academicDepartment.count();
     return {
         meta: {
             page: paginate.page,
@@ -86,30 +96,59 @@ const allDepartments = async (
     }
 }
 
-const singleDepartment = async (id: string): Promise<IAcademicDepartment | null> => {
-    const response = await AcademicDepartment.findById(id).select({ _id: 0 }).populate('academicFaculty')
+const singleDepartment = async (id: string): Promise<Partial<AcademicDepartment> | null> => {
+    const response = await prisma.academicDepartment.findFirst(
+        {
+            where:{id:id},
+            select:{
+                title:true,
+                academicFaculty:true,
+                academicFacultyId:true,
+                faculties:true,
+                students:true
+            }
+        }
+        )
+    
     return response
 }
 
-const updateDepartment = async (id: string, payload: Partial<IAcademicDepartment>): Promise<IAcademicDepartment | null> => {
+const updateDepartment = async (id: string, payload: Partial<AcademicDepartment>): Promise<AcademicDepartment | null> => {
 
-    const isExist = await AcademicDepartment.findById(id)
+    const isExist = await prisma.academicDepartment.findFirst({
+        where:{
+            id:id
+        }
+    })
     if (!isExist) {
         throw new ApiError(400, 'This department not exist');
     }
 
-    const response = await AcademicDepartment.findByIdAndUpdate(id, payload, { new: true, runValidators: true })
+    const response = await prisma.academicDepartment.update({
+        where:{
+            id:id 
+        },
+        data:payload
+    })
     return response
 }
 
 const deleteDepartment = async (id: string) => {
 
-    const isExist = await AcademicDepartment.findById(id)
+    const isExist = await prisma.academicDepartment.findFirst({
+        where:{
+            id:id
+        }
+    })
     if (!isExist) {
         throw new ApiError(400, 'This department not exist');
     }
 
-    const response = await AcademicDepartment.findByIdAndDelete(id)
+    const response = await prisma.academicDepartment.delete({
+        where:{
+            id:id
+        }
+    })
 
     return response
 

@@ -11,15 +11,16 @@ datasource db {
 }
 
 model AcademicSemester {
-  id         String    @id @default(uuid())
-  year       Int
-  title      String
-  code       String
-  startMonth String
-  endMonth   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  students   Student[]
+  id                    String                 @id @default(uuid())
+  year                  Int
+  title                 String
+  code                  String
+  startMonth            String
+  endMonth              String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  students              Student[]
+  semesterRegistrations SemesterRegistration[]
 
   @@map("academic_semesters")
 }
@@ -78,12 +79,12 @@ model Student {
 }
 
 model Faculty {
-  id           String @id @default(uuid())
+  id           String  @id @default(uuid())
   facultyId    String
   firstName    String
   lastName     String
   middleName   String
-  profileImage String
+  profileImage String?
   email        String
   contactNo    String
   gender       String
@@ -96,20 +97,89 @@ model Faculty {
   academicFaculty   AcademicFaculty @relation(fields: [academicFacultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   academicFacultyId String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  courses   CourseFaculty[]
 
   @@map("faculties")
 }
 
-enum SemesterCode {
-  ZERO_1
-  ZERO_2
-  ZERO_3
+model Building {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rooms     Room[]
+
+  @@map("buildings")
 }
 
-enum SemesterTitle {
-  Autumn 
-  Summer 
-  Fall
+model Room {
+  id         String   @id @default(uuid())
+  roomNumber String
+  floor      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  buildingId String
+
+  @@map("rooms")
+}
+
+model Course {
+  id        String   @id @default(uuid())
+  title     String
+  code      String
+  credits   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  preRequisite    CourseToPrerequisite[] @relation("CourseToPrerquisite")
+  preRequisiteFor CourseToPrerequisite[] @relation("PrerequisiteToCourse")
+  faculties       CourseFaculty[]
+
+  @@map("courses")
+}
+
+model CourseToPrerequisite {
+  courseId       String
+  preRequisiteId String
+
+  course       Course @relation(fields: [courseId], references: [id], name: "CourseToPrerquisite")
+  preRequisite Course @relation(fields: [preRequisiteId], references: [id], name: "PrerequisiteToCourse")
+
+  @@id([courseId, preRequisiteId])
+}
+
+model CourseFaculty {
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+
+  facultyId String
+  faculty   Faculty @relation(fields: [facultyId], references: [id])
+
+  @@id([courseId, facultyId])
+  @@map("course_faculties")
+}
+
+model SemesterRegistration {
+  id                 String                     @id @default(uuid())
+  startDate          DateTime
+  endDate            DateTime
+  status             SemesterRegistrationStatus
+  minCredit          Int                        @default(0)
+  maxCredit          Int                        @default(0)
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  academicSemesterId String
+  academicSemester   AcademicSemester           @relation(fields: [academicSemesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("semester_registration")
+}
+
+enum SemesterRegistrationStatus {
+  UPCOMMING
+  ONGOING
+  ENDED
 }

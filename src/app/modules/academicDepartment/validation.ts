@@ -7,7 +7,7 @@ const createDepartmentZodSchema = z.object({
         title: z.string({
             required_error: 'title  is required'
         }),
-        academicFaculty:z.string({
+        academicFacultyId:z.string({
             required_error:'academic faculty referrence number required'
         })
     })

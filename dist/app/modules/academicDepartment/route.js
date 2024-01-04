@@ -11,6 +11,6 @@ const router = (0, express_1.default)();
 router.get('/single-department/:id', controller_1.academicDepartmentController.singleDepartment);
 router.put('/update-department/:id', (0, validateRequest_1.default)(validation_1.AcademicDepartmentZodValidation.updateDepartmentZodSchema), controller_1.academicDepartmentController.updateDepartment);
 router.delete('/delete-department/:id', controller_1.academicDepartmentController.deleteDepartment);
-router.post('/create-ac-department', (0, validateRequest_1.default)(validation_1.AcademicDepartmentZodValidation.createDepartmentZodSchema), controller_1.academicDepartmentController.createAcademicDepartment);
+router.post('/create', (0, validateRequest_1.default)(validation_1.AcademicDepartmentZodValidation.createDepartmentZodSchema), controller_1.academicDepartmentController.createAcademicDepartment);
 router.get('/all-departments', controller_1.academicDepartmentController.allDepartments);
 exports.default = router;

@@ -4,9 +4,12 @@ import { title } from "./interface";
 
 const createFacultyZodSchema = z.object({
     body: z.object({
-        title: z.enum(title as [string, ...string[]],{
-            required_error: 'title  is required'
-        }),
+        title:z.string({
+            required_error:'Academic Faculty title is required'
+        })
+        // title: z.enum(title as [string, ...string[]],{
+        //     required_error: 'title  is required'
+        // }),
     })
 })
 

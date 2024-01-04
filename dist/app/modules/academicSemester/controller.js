@@ -20,13 +20,6 @@ const constants_2 = require("./constants");
 const http_status_1 = __importDefault(require("http-status"));
 const createAcademicSememster = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // if(req.body.code === '01'){
-        //     req.body.code = 'ZERO_1'
-        // }else if(req.body.code === '02'){
-        //     req.body.code = 'ZERO_2'
-        // }else if(req.body.code === '03'){
-        //     req.body.code = 'ZERO_3'
-        // }
         const response = yield service_1.academicSemesterService.createAcademicSemester(req.body);
         res.status(http_status_1.default.OK).json({
             success: true,

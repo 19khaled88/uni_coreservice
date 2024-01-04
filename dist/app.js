@@ -15,6 +15,7 @@ const route_6 = __importDefault(require("./app/modules/faculty/route"));
 const route_7 = __importDefault(require("./app/modules/building/route"));
 const route_8 = __importDefault(require("./app/modules/course/route"));
 const route_9 = __importDefault(require("./app/modules/semesterRegistration/route"));
+const route_10 = __importDefault(require("./app/modules/offeredCourse/route"));
 const http_status_1 = __importDefault(require("http-status"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
@@ -33,6 +34,7 @@ app.use('/api/v1/faculty', route_6.default);
 app.use('/api/v1/building', route_7.default);
 app.use('/api/v1/course', route_8.default);
 app.use('/api/v1/registerSemester', route_9.default);
+app.use('/api/v1/offeredCourse', route_10.default);
 app.get('/', (req, res) => {
     res.json({ message: 'Core service for university management' });
 });

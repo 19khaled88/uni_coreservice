@@ -1,0 +1,2 @@
+export const filterFields = ['searchTerm','courseId','academicDepartmentId','semesterRegistrationId']
+export const offeredCourseSearchableFields=['courseId','academicDepartmentId','semesterRegistrationId']

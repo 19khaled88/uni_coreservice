@@ -12,6 +12,8 @@ import buildingRoute from './app/modules/building/route'
 import courseRoute from './app/modules/course/route'
 import registerSemesterRoute from './app/modules/semesterRegistration/route'
 import offeredCourseRoute from './app/modules/offeredCourse/route'
+import offeredCourseSectionRoute from './app/modules/offeredCourseSection/route'
+import classScheduleRoute from './app/modules/classSchedule/route'
 
 import httpStatus from 'http-status'
 import cookieParser from 'cookie-parser'
@@ -35,6 +37,8 @@ app.use('/api/v1/building',buildingRoute)
 app.use('/api/v1/course',courseRoute)
 app.use('/api/v1/registerSemester',registerSemesterRoute)
 app.use('/api/v1/offeredCourse',offeredCourseRoute)
+app.use('/api/v1/offeredCourseSection',offeredCourseSectionRoute)
+app.use('/api/v1/classSchedule',classScheduleRoute)
 
 
 app.get('/', (req: Request, res: Response) => {

@@ -12,18 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.offeredCourseController = void 0;
+exports.classScheduleController = void 0;
 const service_1 = require("./service");
 const http_status_1 = __importDefault(require("http-status"));
 const pick_1 = __importDefault(require("../../../shared/pick"));
 const constants_1 = require("../../../shared/constants");
 const constants_2 = require("./constants");
-const insertOfferedCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield service_1.offeredCourseService.insertOfferedCourse(req.body);
+        const response = yield service_1.classScheduleService.create(req.body);
         res.status(http_status_1.default.OK).json({
             success: true,
-            message: 'Offered course created successfully',
+            message: 'Class schedule created successfully',
             result: response,
         });
     }
@@ -31,14 +31,14 @@ const insertOfferedCourse = (req, res, next) => __awaiter(void 0, void 0, void 0
         next(error);
     }
 });
-const offeredCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const classSchedules = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const paginationRes = (0, pick_1.default)(req.query, constants_1.paginationFields);
         const filter = (0, pick_1.default)(req.query, constants_2.filterFields);
-        const response = yield service_1.offeredCourseService.offeredCourses(paginationRes, filter);
+        const response = yield service_1.classScheduleService.classSchedules(paginationRes, filter);
         res.status(http_status_1.default.OK).json({
             success: true,
-            message: 'Offered courses retrieved successfully',
+            message: 'Class schedules retrieved successfully',
             result: response,
         });
     }
@@ -46,12 +46,12 @@ const offeredCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         next(error);
     }
 });
-const offeredCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const classSchedule = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield service_1.offeredCourseService.offeredCourse(req.params.id);
+        const response = yield service_1.classScheduleService.classSchedule(req.params.id);
         res.status(http_status_1.default.OK).json({
             success: true,
-            message: 'Offered course retrieved successfully',
+            message: 'Class schedule retrieved successfully',
             result: response,
         });
     }
@@ -59,12 +59,12 @@ const offeredCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
-const offeredCourseUpdate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const classScheduleUpdate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield service_1.offeredCourseService.offeredCourseUpdate(req.params.id, req.body);
+        const response = yield service_1.classScheduleService.classScheduleUpdate(req.params.id, req.body);
         res.status(http_status_1.default.OK).json({
             success: true,
-            message: 'Offered course updated successfully',
+            message: 'Class schedule updated successfully',
             result: response,
         });
     }
@@ -72,12 +72,12 @@ const offeredCourseUpdate = (req, res, next) => __awaiter(void 0, void 0, void 0
         next(error);
     }
 });
-const offeredCourseDelete = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const classScheduleDelete = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield service_1.offeredCourseService.offeredCourseDelete(req.params.id);
+        const response = yield service_1.classScheduleService.classScheduleDelete(req.params.id);
         res.status(http_status_1.default.OK).json({
             success: true,
-            message: 'Offered course deleted successfully',
+            message: 'Class schedule deleted successfully',
             result: response,
         });
     }
@@ -85,10 +85,10 @@ const offeredCourseDelete = (req, res, next) => __awaiter(void 0, void 0, void 0
         next(error);
     }
 });
-exports.offeredCourseController = {
-    insertOfferedCourse,
-    offeredCourses,
-    offeredCourse,
-    offeredCourseUpdate,
-    offeredCourseDelete
+exports.classScheduleController = {
+    create,
+    classSchedules,
+    classSchedule,
+    classScheduleUpdate,
+    classScheduleDelete
 };

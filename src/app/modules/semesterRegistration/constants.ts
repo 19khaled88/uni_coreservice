@@ -4,5 +4,6 @@ export const registerdSemesterSearchableFields=['startDate','endDate','status','
 
 export const semesterUpdatingMapping:{[key:string]:string} ={
     UPCOMMING : 'ONGOING',
-    ONGOING : 'ENDED'
+    ONGOING : 'ENDED',
+    ENDED :'UPCOMMING'
 }

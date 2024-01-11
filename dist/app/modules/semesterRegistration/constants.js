@@ -5,5 +5,6 @@ exports.filterFields = ['searchTerm', 'startDate', 'endDate', 'status', 'minCred
 exports.registerdSemesterSearchableFields = ['startDate', 'endDate', 'status', 'minCredit', 'maxCredit'];
 exports.semesterUpdatingMapping = {
     UPCOMMING: 'ONGOING',
-    ONGOING: 'ENDED'
+    ONGOING: 'ENDED',
+    ENDED: 'UPCOMMING'
 };

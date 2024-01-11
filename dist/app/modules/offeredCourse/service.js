@@ -8,9 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.offeredCourseService = void 0;
 const client_1 = require("@prisma/client");
+const paginationCalculate_1 = require("../../../helpers/paginationCalculate");
+const constants_1 = require("./constants");
 const prisma = new client_1.PrismaClient();
 const insertOfferedCourse = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { academicDepartmentId, semesterRegistrationId, courseIds } = payload;
@@ -102,6 +115,80 @@ const insertOfferedCourse = (payload) => __awaiter(void 0, void 0, void 0, funct
     //   });
     //   return foundRecords
 });
+const offeredCourses = (paginationOptions, filter) => __awaiter(void 0, void 0, void 0, function* () {
+    const { page, limit, sortBy, sortOrder } = paginationOptions;
+    const { searchTerm } = filter, filters = __rest(filter, ["searchTerm"]);
+    const paginate = (0, paginationCalculate_1.calculatePagination)({ page, limit, sortBy, sortOrder });
+    const andCondition = [];
+    if (searchTerm) {
+        andCondition.push({
+            OR: constants_1.offeredCourseSearchableFields.map((item) => {
+                return {
+                    [item]: {
+                        contains: searchTerm,
+                        mode: "insensitive",
+                    },
+                };
+            }),
+        });
+    }
+    if (Object.keys(filters).length > 0) {
+        andCondition.push({
+            AND: Object.keys(filters).map((field) => ({
+                [field]: {
+                    equals: filters[field],
+                },
+            })),
+        });
+    }
+    const finalConditions = andCondition.length > 0 ? { AND: andCondition } : {};
+    const response = yield prisma.offeredCourse.findMany({
+        where: finalConditions,
+        take: paginate.limit,
+        skip: paginate.skip,
+        orderBy: paginate.sortBy && paginate.sortOrder
+            ? { [paginate.sortBy]: paginate.sortOrder }
+            : { createdAt: "asc" },
+    });
+    const total = yield prisma.offeredCourse.count();
+    return {
+        meta: {
+            page: paginate.page,
+            limit: paginate.limit,
+            total,
+        },
+        data: response,
+    };
+});
+const offeredCourse = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma.offeredCourse.findFirst({
+        where: {
+            id: id
+        }
+    });
+    return response;
+});
+const offeredCourseUpdate = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma.offeredCourse.update({
+        where: {
+            id: id
+        },
+        data: payload
+    });
+    return response;
+});
+const offeredCourseDelete = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma.offeredCourse.delete({
+        where: {
+            id: id
+        }
+    });
+    return response;
+});
 exports.offeredCourseService = {
     insertOfferedCourse,
+    offeredCourses,
+    offeredCourse,
+    offeredCourseUpdate,
+    offeredCourseDelete
 };
